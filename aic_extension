@@ -1,0 +1,87 @@
+Airtable Extention for 
+
+#AIC UUID
+
+//5f7d7029002600000a33bf7f23540002
+// edit these values to customize your script!
+let table = base.getTable("AIC738_08102020");
+let field = table.getField("Service Name");
+let field1 = table.getField("IP Address");
+let field2 = table.getField("Port");
+
+let findText = await input.textAsync('Enter UUID:');
+let findText4 = await input.textAsync('Enter Name:');
+//
+findText = findText.trim();
+let timestamp = findText.substring(0,7)
+let findText1 = findText.substring(16, 24)
+let port1 = findText.substring(24, 28)
+let ipv = parseInt(findText1);
+//output.text('Hex Value '+port1);
+var dec = parseInt(port1,16); //final port value
+var timestamp1 = parseInt(timestamp,16); //final port value
+var binary = dec.toString(2);
+var octal = dec.toString(8);
+
+//output.text('Binary Value '+binary);
+//output.text('octal Value '+octal);
+//time
+
+let unix_timestamp = timestamp1
+// Create a new JavaScript Date object based on the timestamp
+// multiplied by 1000 so that the argument is in milliseconds, not seconds.
+var date = new Date(unix_timestamp * 1000);
+// Hours part from the timestamp
+var hours = date.getHours();
+// Minutes part from the timestamp
+var minutes = "0" + date.getMinutes();
+// Seconds part from the timestamp
+var seconds = "0" + date.getSeconds();
+
+// Will display time in 10:30:23 format
+var formattedTime =' Time -> ' + hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+ var formattedDate = 'Date ->' + date
+let ip = "";
+let i = 0;
+for( i = 0; i < findText1.length; i = i + 2) {
+    ip = ip + parseInt(findText1.substring(i, i+2), 16) + ".";
+        
+}
+let ipaddr = ip.substring(0,ip.length-1);
+output.text("Ip Final = " + ipaddr );
+output.text(' ** '+ formattedDate);
+output.text(' ** '+ formattedTime);
+output.text('Port Number '+dec);
+
+// Load all of the records in the table
+let result = await table.selectRecordsAsync();
+
+// Find every record we need to update
+//let replacements = [];
+for (let record of result.records) {
+    let originalValue = record.getCellValue(field);
+    let originalValue1 = record.getCellValue(field1);
+    let originalValue2 = record.getCellValue(field2);
+        if (!originalValue2) {
+        continue;
+    }
+    if (originalValue1 === ipaddr && originalValue2 === dec.toString() ) {
+        output.table([
+    {'Service Name': record.getCellValue(field), 'IP Address': record.getCellValue(field1), 'Port Number ': record.getCellValue(field2)}
+
+]);
+   // output.text('Service Name : '+record.getCellValue(field));
+   // output.text('IP Address   : '+record.getCellValue(field1));
+   // output.text('Port Number  : '+record.getCellValue(field2));
+   } else{
+      
+   }
+     //   output.text('Service Name '+record.getCellValue(field));
+   // output.text('IP Address '+record.getCellValue(field1));
+    //output.text('Port Number '+record.getCellValue(field2));
+    // Skip records which don't have the value set, so the value is null
+
+   // let newValue = originalValue.replace(findText, replaceText);
+
+    
+}
